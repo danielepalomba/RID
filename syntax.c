@@ -254,6 +254,18 @@ char *syntax_c_highlight_row(const char *string){
     }
 
     while(i < slen){
+        /* String literals: color the whole "..." span in GREEN */
+        if(string[i] == '"'){
+            size_t str_start = i;
+            i++;
+            while(i < slen && string[i] != '"')
+                i++;
+            if(i < slen)
+                i++; /* include the closing '"' */
+            out_append_colored(&out, &cap, &olen, MAGENTA, &string[str_start], i - str_start);
+            continue;
+        }
+
         if(is_ident_char(string[i])){
             int left_ok = (i == 0) || !is_ident_char(string[i - 1]);
 

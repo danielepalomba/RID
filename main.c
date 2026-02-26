@@ -22,6 +22,7 @@
  */
 int main(int argc, char **argv){
     
+    system("clear");
     editor_init();
 
     if(argc >= 2)
