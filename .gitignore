@@ -1,0 +1,8 @@
+#DOC
+latex
+
+#OBJ FILE
+*.o
+
+#APP
+rid
