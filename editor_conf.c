@@ -94,7 +94,15 @@ void editor_del_row(int at){
 /** @copydoc editor_del_char */
 void editor_del_char(int c){
     (void)c;
-    if(ec->c_y == (int)ec->numrows) return;
+    /* If cursor is past the last line and at column 0, simply move to the end of the previous line. */
+    if(ec->c_y == (int)ec->numrows){
+        if(ec->c_x == 0 && ec->c_y > 0){
+            ec->c_y--;
+            ec->c_x = utf8_codepoint_count(ec->row[ec->c_y].chars, ec->row[ec->c_y].size);
+        }
+        return;
+    }
+    
     if(ec->c_x == 0 && ec->c_y == 0) return;
 
     Rrow row = &ec->row[ec->c_y];
