@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['6_20supporto_20per_20tab_20tt_20t_20tt_0',['6. Supporto per Tab (&lt;tt&gt;\t&lt;/tt&gt;)',['../md_PROGETTO.html#autotoc_md30',1,'']]]
+  ['numrows_0',['numrows',['../structeditor__conf.html#a2774e972d2646129dae5aa8c808ffdb6',1,'editor_conf']]]
 ];

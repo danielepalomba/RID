@@ -31,8 +31,7 @@ int main(int argc, char **argv){
     set_input_mode();
 
     editor_refresh_screen();
-
-
+   
     while(1){
         int c = term_read_key();
 

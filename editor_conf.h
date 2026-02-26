@@ -31,6 +31,12 @@ extern Ec ec;
 void editor_init(void);
 
 /**
+ * @brief  Draw the status bar (last terminal row) into the append buffer.
+ * @param[in,out] ab  Append buffer that accumulates terminal output.
+ */
+void editor_draw_status_bar(Abuf ab);
+
+/**
  * @brief  Insert a new row at position @p at, shifting subsequent rows down.
  * @param[in] at   Zero-based index where the row is inserted.
  * @param[in] s    Source bytes for the new row.

@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['1_20lettura_20da_20tastiera_20tt_20term_20c_20tt_20→_20tt_20term_5fread_5fkey_20tt_0',['1. Lettura da tastiera (&lt;tt&gt;term.c&lt;/tt&gt; → &lt;tt&gt;term_read_key&lt;/tt&gt;)',['../md_PROGETTO.html#autotoc_md39',1,'']]],
-  ['1_20syntax_20highlighting_20evidenziazione_20sintassi_1',['1. Syntax Highlighting (evidenziazione sintassi)',['../md_PROGETTO.html#autotoc_md20',1,'']]]
+  ['c_5fx_0',['c_x',['../structeditor__conf.html#a744ae89e761144428c476ffc9f6d0c61',1,'editor_conf']]],
+  ['c_5fy_1',['c_y',['../structeditor__conf.html#ae6e3be30afee9515dc7c071efb5a2ef4',1,'editor_conf']]],
+  ['chars_2',['chars',['../structrrow.html#a1a00bf07d78939d38f355791a022581f',1,'rrow']]],
+  ['coloff_3',['coloff',['../structeditor__conf.html#aa56c49e06d6c3f6ddbdc027111036eda',1,'editor_conf']]]
 ];

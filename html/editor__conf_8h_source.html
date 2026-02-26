@@ -108,25 +108,29 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keywordtype">void</span> editor_append_row(<span class="keyword">const</span> <span class="keywordtype">char</span> *s, <span class="keywordtype">size_t</span> len);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">void</span> editor_insert_char(<span class="keywordtype">int</span> c);</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keywordtype">void</span> editor_del_row(<span class="keywordtype">int</span> at);</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keywordtype">void</span> editor_insert_newline(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keywordtype">void</span> editor_del_char(<span class="keywordtype">int</span> c);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="keywordtype">void</span> editor_insert_char(<span class="keywordtype">int</span> c);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keywordtype">void</span> editor_insert_newline(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="keywordtype">void</span> editor_move_cursor(<span class="keywordtype">int</span> key);</div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keywordtype">void</span> editor_draw_rows(<a class="code hl_struct" href="structabuf.html">Abuf</a> ab);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keywordtype">void</span> editor_scroll(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="keywordtype">void</span> editor_insert_tab(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="keywordtype">void</span> editor_del_char(<span class="keywordtype">int</span> c);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keywordtype">void</span> editor_move_cursor(<span class="keywordtype">int</span> key);</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="keywordtype">void</span> editor_refresh_screen(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="keywordtype">void</span> editor_open(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_variable" href="structeditor__conf.html#abfa4830c976ed98e0d1d9eb112a6c5d9">filename</a>);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="keywordtype">void</span> editor_draw_rows(<a class="code hl_struct" href="structabuf.html">Abuf</a> ab);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span><span class="keywordtype">void</span> editor_scroll(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="keywordtype">int</span> editor_save_file(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="keywordtype">void</span> editor_refresh_screen(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="keywordtype">void</span> editor_open(<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code hl_variable" href="structeditor__conf.html#abfa4830c976ed98e0d1d9eb112a6c5d9">filename</a>);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span><span class="keywordtype">int</span> editor_save_file(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="astructabuf_html"><div class="ttname"><a href="structabuf.html">abuf</a></div><div class="ttdoc">Dynamically growable byte buffer used for batched terminal writes.</div><div class="ttdef"><b>Definition</b> abuf.h:12</div></div>
 <div class="ttc" id="astructeditor__conf_html"><div class="ttname"><a href="structeditor__conf.html">editor_conf</a></div><div class="ttdoc">Global editor state: cursor, viewport, file content, and window size.</div><div class="ttdef"><b>Definition</b> editor_conf.h:11</div></div>
 <div class="ttc" id="astructeditor__conf_html_a158d71eee8d50ef210a699b576f0591c"><div class="ttname"><a href="structeditor__conf.html#a158d71eee8d50ef210a699b576f0591c">editor_conf::window_width</a></div><div class="ttdeci">int window_width</div><div class="ttdef"><b>Definition</b> editor_conf.h:19</div></div>

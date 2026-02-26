@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['8_0',['8',['../md_PROGETTO.html#autotoc_md17',1,'&lt;tt&gt;utf8.h/c&lt;/tt&gt; — Utilità UTF-8'],['../md_PROGETTO.html#autotoc_md38',1,'Come il tuo codice gestisce UTF-8'],['../md_PROGETTO.html#autotoc_md35',1,'Cos&apos;è UTF-8?'],['../md_PROGETTO.html#autotoc_md34',1,'Guida alla codifica UTF-8'],['../md_PROGETTO.html#autotoc_md43',1,'Tabella riassuntiva delle funzioni UTF-8'],['../md_PROGETTO.html#autotoc_md44',1,'Trappole comuni con UTF-8']]]
+  ['rid_0',['RID',['../md_README.html',1,'']]],
+  ['row_1',['row',['../structeditor__conf.html#a8fc40f5f761521fba14b538d9daa33ad',1,'editor_conf']]],
+  ['rowoff_2',['rowoff',['../structeditor__conf.html#a8131078ee2061ea8bae7b82a3721eac6',1,'editor_conf']]],
+  ['rrow_3',['rrow',['../structrrow.html',1,'']]]
 ];

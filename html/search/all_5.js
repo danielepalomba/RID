@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['5_20numeri_20di_20riga_0',['5. Numeri di riga',['../md_PROGETTO.html#autotoc_md28',1,'']]]
+  ['lang_0',['lang',['../structSyntax.html#a9d56b538b5467dd2837e803b253f1174',1,'Syntax']]]
 ];

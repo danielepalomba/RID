@@ -28,6 +28,34 @@ void editor_init(void){
     }
 }
 
+/** @copydoc editor_draw_status_bar */
+void editor_draw_status_bar(Abuf ab){
+    /* Inverted colors */
+    ab_append(ab, "\x1b[7m", 4);
+
+    char status[80];
+    int len;
+
+    const char *fname = ec->filename ? ec->filename : "[No Name]";
+    /* +1: display is 1-based; clamp c_y so it never exceeds numrows */
+    int display_row = (ec->c_y < (int)ec->numrows ? ec->c_y : (int)ec->numrows - 1) + 1;
+    int display_col = ec->c_x + 1;
+    
+    len = snprintf(status, sizeof(status),
+                   " <%.20s>  |  Ln %d, Col %d | TotL %ld | Better save, because no one will :)",
+                   fname, display_row, display_col, ec->numrows);
+
+    if(len > ec->window_width) len = ec->window_width;
+    ab_append(ab, status, len);
+
+    /* Pad the rest of the line with spaces */
+    for(int i = len; i < ec->window_width; i++)
+        ab_append(ab, " ", 1);
+
+    /* Reset video attributes */
+    ab_append(ab, "\x1b[m", 3);
+}
+
 /** @copydoc editor_insert_row */
 void editor_insert_row(int at, const char *s, size_t len){
     if(at < 0 || at > (int) ec->numrows) return;
@@ -234,7 +262,8 @@ done:
 
 /** @copydoc editor_draw_rows */
 void editor_draw_rows(Abuf ab){
-    for(int i = 0; i < (int)ec->window_height; i++){
+    /* The last row is reserved for the status bar */
+    for(int i = 0; i < (int)ec->window_height - 1; i++){
         int filerow = i + ec->rowoff;
 
         if(filerow >= (int)ec->numrows){
@@ -294,8 +323,7 @@ void editor_draw_rows(Abuf ab){
             }
         }
         ab_append(ab, "\x1b[K", 3);
-        if(i < (int)ec->window_height - 1)
-            ab_append(ab, "\r\n",2);
+        ab_append(ab, "\r\n", 2);
     }
  }
 
@@ -357,6 +385,7 @@ void editor_refresh_screen(void) {
     ab_append(&ab, "\x1b[H", 3);
 
     editor_draw_rows(&ab);
+    editor_draw_status_bar(&ab);
 
     char buf[32];
     int vcol = cx_to_visual_col(ec->c_x);

@@ -1,8 +1,5 @@
 var searchData=
 [
-  ['bar_0',['2. Barra di stato (status bar)',['../md_PROGETTO.html#autotoc_md22',1,'']]],
-  ['barra_20di_20stato_20status_20bar_1',['2. Barra di stato (status bar)',['../md_PROGETTO.html#autotoc_md22',1,'']]],
-  ['blockquote_2',['&lt;/blockquote&gt;',['../md_PROGETTO.html#autotoc_md45',1,'']]],
-  ['buffer_20di_20append_3',['&lt;tt&gt;abuf.h/c&lt;/tt&gt; — Buffer di append',['../md_PROGETTO.html#autotoc_md16',1,'']]],
-  ['byte_4',['Il concetto chiave: codepoint vs byte',['../md_PROGETTO.html#autotoc_md42',1,'']]]
+  ['window_5fheight_0',['window_height',['../structeditor__conf.html#a1790fb11a875853f3315367095d89e19',1,'editor_conf']]],
+  ['window_5fwidth_1',['window_width',['../structeditor__conf.html#a158d71eee8d50ef210a699b576f0591c',1,'editor_conf']]]
 ];
