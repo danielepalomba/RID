@@ -83,6 +83,14 @@ void editor_insert_tab(void){
     }
 }
 
+/** @copydoc editor_del_row */
+void editor_del_row(int at){
+    if(at < 0 || at >= (int)ec->numrows) return;
+    free(ec->row[at].chars);
+    memmove(&ec->row[at], &ec->row[at + 1], sizeof(struct rrow) * (ec->numrows - at - 1));
+    ec->numrows--;
+}
+
 /** @copydoc editor_del_char */
 void editor_del_char(int c){
     (void)c;
@@ -94,6 +102,17 @@ void editor_del_char(int c){
     if(ec->c_x > 0){
         rrow_del_char(row, ec->c_x - 1);
         ec->c_x--;
+    }else{
+        ec->c_x = utf8_codepoint_count(ec->row[ec->c_y - 1].chars, ec->row[ec->c_y - 1].size);
+        
+        Rrow prev_row = &ec->row[ec->c_y - 1];
+        prev_row->chars = realloc(prev_row->chars, prev_row->size + row->size + 1);
+        memcpy(&prev_row->chars[prev_row->size], row->chars, row->size);
+        prev_row->size += row->size;
+        prev_row->chars[prev_row->size] = '\0';
+        
+        editor_del_row(ec->c_y);
+        ec->c_y--;
     }
 }
 

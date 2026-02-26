@@ -46,6 +46,12 @@ void editor_insert_row(int at, const char *s, size_t len);
 void editor_append_row(const char *s, size_t len);
 
 /**
+ * @brief  Delete the row at position @p at, shifting subsequent rows up.
+ * @param[in] at   Zero-based index of the row to delete.
+ */
+void editor_del_row(int at);
+
+/**
  * @brief  Insert a character at the current cursor position.
  * @param[in] c  Unicode codepoint to insert.
  */
