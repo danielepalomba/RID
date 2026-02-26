@@ -82,14 +82,14 @@ void syntax_set_ext(const char *ext){
 
 /** @copydoc syntax_get_keyword_color */
 ColorCode syntax_get_keyword_color(int idx){
-    if(idx < C_KW_MODIFIERS_START)   return CYAN;
-    if(idx < C_KW_AGGREGATES_START)  return CYAN;
-    if(idx < C_KW_CONDITIONS_START)  return GREEN;
-    if(idx < C_KW_LOOPS_START)       return YELLOW;
-    if(idx < C_KW_JUMPS_START)       return MAGENTA;
-    if(idx < C_KW_STORAGE_START)     return RED;
-    if(idx < C_KW_QUALIFIERS_START)  return BLUE;
-    if(idx < C_KEYWORDS_NUM)         return WHITE;
+    if(idx < C_KW_MODIFIERS_START)   return CYAN;     /* Data types      */
+    if(idx < C_KW_AGGREGATES_START)  return BLUE;     /* Modifiers       */
+    if(idx < C_KW_CONDITIONS_START)  return GREEN;    /* Aggregates      */
+    if(idx < C_KW_LOOPS_START)       return YELLOW;   /* Conditions      */
+    if(idx < C_KW_JUMPS_START)       return MAGENTA;  /* Loops           */
+    if(idx < C_KW_STORAGE_START)     return RED;      /* Jumps           */
+    if(idx < C_KW_QUALIFIERS_START)  return BLUE;     /* Storage classes */
+    if(idx < C_KEYWORDS_NUM)         return WHITE;    /* Qualifiers + operators */
     return RESET;
 }
 
@@ -139,6 +139,9 @@ static size_t try_highlight_include(const char *s, size_t slen, size_t i,
 
     if(j + 7 > slen || strncmp(&s[j], "include", 7) != 0)
         return 0;
+    /* Word-boundary: avoid matching "#includeFoo", "#includes", etc. */
+    if(j + 7 < slen && is_ident_char(s[j + 7]))
+        return 0;
     j += 7;
 
     /* Emit any leading whitespace before '#' uncolored */
@@ -171,6 +174,62 @@ static size_t try_highlight_include(const char *s, size_t slen, size_t i,
     return slen - start;
 }
 
+/**
+ * @brief  Try to match and highlight a @c \#define directive starting at
+ *         position @p i.
+ *
+ * Colors the directive keyword in BRIGHT_GREEN. If a match is found the entire remaining line is consumed.
+ *
+ * @param[in]     s     Source line.
+ * @param[in]     slen  Byte length of @p s.
+ * @param[in]     i     Starting byte index.
+ * @param[in,out] out   Output buffer pointer.
+ * @param[in,out] cap   Output buffer capacity.
+ * @param[in,out] olen  Bytes written to @p out so far.
+ * @return Number of source bytes consumed, or 0 if no match.
+ */
+static size_t try_highlight_define(const char *s, size_t slen, size_t i,
+                                    char **out, size_t *cap, size_t *olen){
+    size_t start = i;
+
+    size_t j = i;
+    while(j < slen && (s[j] == ' ' || s[j] == '\t'))
+        j++;
+
+    if(j >= slen || s[j] != '#')
+        return 0;
+
+    size_t hash_pos = j;
+    j++;
+    while(j < slen && (s[j] == ' ' || s[j] == '\t'))
+        j++;
+
+    if(j + 6 > slen || strncmp(&s[j], "define", 6) != 0)
+        return 0;
+    /* Word-boundary: avoid matching "#defined", "#defineXYZ", etc. */
+    if(j + 6 < slen && is_ident_char(s[j + 6]))
+        return 0;
+    j += 6;
+
+    /* Emit any leading whitespace before '#' uncolored */
+    if(start < hash_pos)
+        out_append(out, cap, olen, &s[start], hash_pos - start);
+
+    out_append_colored(out, cap, olen, BRIGHT_GREEN, &s[hash_pos], j - hash_pos);
+
+    size_t ws_start = j;
+    while(j < slen && (s[j] == ' ' || s[j] == '\t'))
+        j++;
+
+    if(ws_start < j)
+        out_append(out, cap, olen, &s[ws_start], j - ws_start);
+
+    if(j < slen)
+        out_append(out, cap, olen, &s[j], slen - j);
+
+    return slen - start;
+}
+
 /** @copydoc syntax_c_highlight_row */
 char *syntax_c_highlight_row(const char *string){
     size_t slen = strlen(string);
@@ -184,6 +243,12 @@ char *syntax_c_highlight_row(const char *string){
     /* Try #include — if it matches, the whole line is consumed */
     size_t inc = try_highlight_include(string, slen, 0, &out, &cap, &olen);
     if(inc > 0){
+        out[olen] = '\0';
+        return out;
+    }
+
+    size_t def = try_highlight_define(string, slen, 0, &out, &cap, &olen);
+    if(def > 0){
         out[olen] = '\0';
         return out;
     }
@@ -229,7 +294,7 @@ char *syntax_c_highlight_row(const char *string){
 
                 if(peek < slen && string[peek] == '('){
                     out_append_colored(&out, &cap, &olen,
-                                       YELLOW, &string[id_start], id_len);
+                                        GREEN, &string[id_start], id_len);
                 }else{
                     out_append(&out, &cap, &olen, &string[id_start], id_len);
                 }
