@@ -71,6 +71,18 @@ void editor_insert_newline(void){
     ec->c_x = 0;
 }
 
+/** @copydoc editor_insert_tab */
+void editor_insert_tab(void){
+    if(ec->c_y == (int)ec->numrows)
+        editor_append_row("", 0);
+    
+    int tab_width = 4 - (ec->c_x % 4);
+    for(int i = 0; i < tab_width; i++){
+        rrow_insert_char(&ec->row[ec->c_y], ec->c_x, ' ');
+        ec->c_x++;
+    }
+}
+
 /** @copydoc editor_del_char */
 void editor_del_char(int c){
     (void)c;
@@ -122,13 +134,14 @@ void editor_move_cursor(int key){
  */
 static char *truncate_highlighted(const char *src, int skip_cp, int max_visible){
     size_t slen = strlen(src);
-    char *out = malloc(slen + 8);
+    /* Allocate extra space: each tab can expand to at most 4 spaces */
+    char *out = malloc(slen * 4 + 8);
     if(!out) return NULL;
 
     size_t si = 0;
     size_t oi = 0;
-    int vis = 0;
-    int skipped = 0;
+    int vis = 0;       /* visible columns emitted so far (after skip)  */
+    int abs_col = 0;   /* absolute visual column (skip + vis)           */
 
     while(si < slen){
         /* ANSI escape: \033[ ... m — pass through without counting */
@@ -139,7 +152,7 @@ static char *truncate_highlighted(const char *src, int skip_cp, int max_visible)
                 si++;
             if(si < slen) si++;
 
-            if(skipped >= skip_cp){
+            if(abs_col >= skip_cp){
                 size_t seq_len = si - start;
                 memcpy(&out[oi], &src[start], seq_len);
                 oi += seq_len;
@@ -147,11 +160,28 @@ static char *truncate_highlighted(const char *src, int skip_cp, int max_visible)
             continue;
         }
 
+        /* Tab expansion: expand to next 4-column tab stop */
+        if((unsigned char)src[si] == '\t'){
+            int tab_width = 4 - (abs_col % 4);
+            for(int s = 0; s < tab_width; s++){
+                if(abs_col < skip_cp){
+                    abs_col++;
+                } else {
+                    if(vis >= max_visible) goto done;
+                    out[oi++] = ' ';
+                    vis++;
+                    abs_col++;
+                }
+            }
+            si++;
+            continue;
+        }
+
         int cplen = utf8_byte_length((uint8_t)src[si]);
         if(si + (size_t)cplen > slen) cplen = (int)(slen - si);
 
-        if(skipped < skip_cp){
-            skipped++;
+        if(abs_col < skip_cp){
+            abs_col++;
             si += (size_t)cplen;
             continue;
         }
@@ -163,8 +193,10 @@ static char *truncate_highlighted(const char *src, int skip_cp, int max_visible)
         oi += (size_t)cplen;
         si += (size_t)cplen;
         vis++;
+        abs_col++;
     }
 
+done:
     /* Ensure colors are reset at end of line */
     memcpy(&out[oi], "\033[0m", 4);
     oi += 4;
@@ -194,21 +226,44 @@ void editor_draw_rows(Abuf ab){
                     free(truncated);
                 }
             }else{
-                /* Fallback: raw output with coloff/width clipping */
-                size_t byte_off = utf8_byte_offset(ec->row[filerow].chars,
-                                                    ec->row[filerow].size,
-                                                    ec->coloff);
-                size_t remaining = ec->row[filerow].size - byte_off;
-                size_t vis_cp = utf8_codepoint_count(
-                    &ec->row[filerow].chars[byte_off], remaining);
-                if(vis_cp > (size_t)ec->window_width){
-                    remaining = utf8_byte_offset(
-                        &ec->row[filerow].chars[byte_off],
-                        remaining, ec->window_width);
+                /* Fallback: coloff/width clipping with tab expansion */
+                const char *src   = ec->row[filerow].chars;
+                size_t      ssize = ec->row[filerow].size;
+                int vis_col = 0;   /* visual column on screen (after coloff)  */
+                int skipped = 0;   /* visual columns consumed before coloff   */
+
+                for(size_t bi = 0; bi < ssize; ){
+                    if((unsigned char)src[bi] == '\t'){
+                        /* Tab stops every 4 columns (absolute) */
+                        int abs_col   = skipped + vis_col;
+                        int tab_width = 4 - (abs_col % 4);
+
+                        for(int s = 0; s < tab_width; s++){
+                            if(skipped < ec->coloff){
+                                skipped++;
+                            } else {
+                                if(vis_col >= ec->window_width) goto row_done;
+                                ab_append(ab, " ", 1);
+                                vis_col++;
+                            }
+                        }
+                        bi++;
+                    } else {
+                        int cplen = utf8_byte_length((uint8_t)src[bi]);
+                        if(bi + (size_t)cplen > ssize)
+                            cplen = (int)(ssize - bi);
+
+                        if(skipped < ec->coloff){
+                            skipped++;
+                        } else {
+                            if(vis_col >= ec->window_width) goto row_done;
+                            ab_append(ab, &src[bi], cplen);
+                            vis_col++;
+                        }
+                        bi += (size_t)cplen;
+                    }
                 }
-                if(remaining > 0)
-                    ab_append(ab, &ec->row[filerow].chars[byte_off],
-                              (int)remaining);
+                row_done:;
             }
         }
         ab_append(ab, "\x1b[K", 3);
@@ -218,19 +273,51 @@ void editor_draw_rows(Abuf ab){
  }
 
 
+/**
+ * @brief  Compute the visual (screen) column for codepoint index @p cx
+ *         in the current row, expanding tab characters to 4-column stops.
+ * @param[in] cx  Codepoint index into the current row (i.e., ec->c_x).
+ * @return Visual column (0-based).
+ */
+static int cx_to_visual_col(int cx){
+    if(ec->c_y >= (int)ec->numrows) return cx;
+
+    const char *s    = ec->row[ec->c_y].chars;
+    size_t      slen = ec->row[ec->c_y].size;
+    int vcol = 0;
+    int cp   = 0;
+    size_t bi = 0;
+
+    while(bi < slen && cp < cx){
+        if((unsigned char)s[bi] == '\t'){
+            vcol += 4 - (vcol % 4);
+            bi++;
+        } else {
+            int clen = utf8_byte_length((uint8_t)s[bi]);
+            if(bi + (size_t)clen > slen) break;
+            bi += (size_t)clen;
+            vcol++;
+        }
+        cp++;
+    }
+    return vcol;
+}
+
 /** @copydoc editor_scroll */
 void editor_scroll(void){
+    int vcol = cx_to_visual_col(ec->c_x);
+
     if(ec->c_y < ec->rowoff)
         ec->rowoff = ec->c_y;
 
     if(ec->c_y >= ec->rowoff + ec->window_height)
         ec->rowoff = ec->c_y - ec->window_height + 1;
 
-    if(ec->c_x < ec->coloff)
-        ec->coloff = ec->c_x;
+    if(vcol < ec->coloff)
+        ec->coloff = vcol;
 
-    if(ec->c_x >= ec->coloff + ec->window_width)
-        ec->coloff = ec->c_x - ec->window_width + 1;
+    if(vcol >= ec->coloff + ec->window_width)
+        ec->coloff = vcol - ec->window_width + 1;
 }
 
 /** @copydoc editor_refresh_screen */
@@ -245,7 +332,8 @@ void editor_refresh_screen(void) {
     editor_draw_rows(&ab);
 
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (ec->c_y - ec->rowoff) + 1, (ec->c_x - ec->coloff) + 1);
+    int vcol = cx_to_visual_col(ec->c_x);
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (ec->c_y - ec->rowoff) + 1, (vcol - ec->coloff) + 1);
 
     ab_append(&ab, buf, strlen(buf));
     ab_append(&ab, "\x1b[?25h", 6);

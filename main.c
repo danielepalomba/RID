@@ -50,6 +50,8 @@ int main(int argc, char **argv){
             editor_del_char(c);
         }else if(c == ARROW_UP || c == ARROW_DOWN || c == ARROW_LEFT || c == ARROW_RIGHT){
             editor_move_cursor(c);
+        }else if(c == '\t'){
+            editor_insert_tab();
         }else{
             if(c >= 32 && c != 127){
                 editor_insert_char(c);

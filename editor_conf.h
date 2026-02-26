@@ -57,6 +57,11 @@ void editor_insert_char(int c);
 void editor_insert_newline(void);
 
 /**
+ * @brief Insert a tab at the current cursor position. 
+ */
+void editor_insert_tab(void);
+
+/**
  * @brief  Delete the character before the cursor.
  * @param[in] c  Unused (reserved for future direction parameter).
  */
