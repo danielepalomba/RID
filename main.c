@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "editor_conf.h"
 #include "term.h"
@@ -15,18 +16,40 @@
 #define HOME_CURS "\x1b[H"
 
 /**
+* @brief Show usage to user and exit the program.
+*/
+void prog_failure(){
+    fprintf(stderr,"Usage: ./rid <filename> [--nowr]\n");
+    exit(EXIT_FAILURE);
+}
+
+/**
  * @brief  Entry point for the rid text editor.
  * @param[in] argc  Argument count.
  * @param[in] argv  Argument vector; argv[1] is the optional file to open.
  * @return EXIT_SUCCESS on normal termination.
  */
-int main(int argc, char **argv){
+int main(int argc, char **argv){ 
     
     system("clear");
     editor_init();
 
-    if(argc >= 2)
-        editor_open(argv[1]);
+    switch(argc){
+        case 2: 
+            editor_open(argv[1]);
+            break;
+        case 3: 
+            if(strcmp(argv[2], "--nowr") == 0){ //no word wrap
+                editor_open(argv[1]);
+                editor_set_word_wrap(0);
+                break; 
+            }else{
+                prog_failure();
+                break; // in order to have no warnings
+            }
+        default:
+          prog_failure(); 
+    }
 
     set_input_mode();
 

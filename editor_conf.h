@@ -18,6 +18,7 @@ struct editor_conf{
     char *filename;       /**< Currently open filename (heap-allocated). */
     int window_width;     /**< Terminal width in columns.                */
     int window_height;    /**< Terminal height in rows.                  */
+    unsigned short word_wrap; /**< Flag for word wrapping.               */
 };
 
 typedef struct editor_conf *Ec;
@@ -29,6 +30,11 @@ extern Ec ec;
  * @brief  Initialize the editor state and query the terminal size.
  */
 void editor_init(void);
+
+/**
+ * @bried Setter function for word_wrap field in editor_conf
+*/
+void editor_set_word_wrap(unsigned short flag);
 
 /**
  * @brief  Draw the status bar (last terminal row) into the append buffer.

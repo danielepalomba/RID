@@ -24,11 +24,22 @@ void editor_init(void){
     ec->coloff = 0;
     ec->row = NULL;
     ec->filename = NULL;
+    ec->word_wrap = 1;
 
     if(get_terminal_dimension(ec) == -1){
         perror("Could not read terminal dimension");
         exit(EXIT_FAILURE);
     }
+}
+
+/** @cpoydoc set_word_wrap */
+void editor_set_word_wrap(unsigned short flag){
+    if(flag == 1)
+        ec->word_wrap = flag;
+    else if(flag == 0)
+        ec->word_wrap = flag;
+    else //not valid value
+        ec->word_wrap = 1; //default
 }
 
 /** @copydoc editor_draw_status_bar */
@@ -106,8 +117,13 @@ void editor_append_row(const char *s, size_t len){
 
 /** @copydoc editor_insert_char */
 void editor_insert_char(int c){
+    
     if(ec->c_y == (int)ec->numrows)
         editor_append_row("", 0);
+
+    if(ec->c_x == ec->window_width && ec->word_wrap)
+        editor_insert_newline(); //set ec->c_y += 1 & ec->c_x = 0
+       
     rrow_insert_char(&ec->row[ec->c_y], ec->c_x, (uint32_t)c);
     ec->c_x++;
 }
