@@ -9,6 +9,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define VERSION "1.0"
+#define EDITOR_NAME "RID "
+
 static struct editor_conf ec_storage;
 Ec ec = &ec_storage;
 
@@ -54,6 +57,35 @@ void editor_draw_status_bar(Abuf ab){
 
     /* Reset video attributes */
     ab_append(ab, "\x1b[m", 3);
+}
+
+/** @copydoc editor_draw_header_bar */ 
+void editor_draw_header_bar(Abuf ab) { 
+   
+    ab_append(ab, "\x1b[7m", 4); 
+     
+    char header_full[25]; 
+    snprintf(header_full, sizeof(header_full), "%s %s", EDITOR_NAME, VERSION); 
+
+    int len = (int)strlen(header_full); 
+    if (len > ec->window_width) len = ec->window_width;
+
+    int padding = (ec->window_width - len) / 2;
+     
+    for (int i = 0; i < padding; i++) {
+        ab_append(ab, " ", 1);
+    }
+     
+    ab_append(ab, header_full, len); 
+     
+    int current_len = padding + len;
+    while (current_len < ec->window_width) {
+        ab_append(ab, " ", 1);
+        current_len++;
+    }
+
+    ab_append(ab, "\x1b[m", 3); 
+    ab_append(ab, "\r\n", 2); 
 }
 
 /** @copydoc editor_insert_row */
@@ -262,8 +294,8 @@ done:
 
 /** @copydoc editor_draw_rows */
 void editor_draw_rows(Abuf ab){
-    /* The last row is reserved for the status bar */
-    for(int i = 0; i < (int)ec->window_height - 1; i++){
+    /* Header and status bar are drawn separately; draw only the text area */
+    for(int i = 0; i < (int)ec->window_height - 2; i++){
         int filerow = i + ec->rowoff;
 
         if(filerow >= (int)ec->numrows){
@@ -362,11 +394,14 @@ static int cx_to_visual_col(int cx){
 void editor_scroll(void){
     int vcol = cx_to_visual_col(ec->c_x);
 
+    /* Usable text rows: total height minus header row and status bar row */
+    int text_rows = ec->window_height - 2;
+
     if(ec->c_y < ec->rowoff)
         ec->rowoff = ec->c_y;
 
-    if(ec->c_y >= ec->rowoff + ec->window_height)
-        ec->rowoff = ec->c_y - ec->window_height + 1;
+    if(ec->c_y >= ec->rowoff + text_rows)
+        ec->rowoff = ec->c_y - text_rows + 1;
 
     if(vcol < ec->coloff)
         ec->coloff = vcol;
@@ -383,13 +418,15 @@ void editor_refresh_screen(void) {
 
     ab_append(&ab, "\x1b[?25l", 6);
     ab_append(&ab, "\x1b[H", 3);
-
+     
+    editor_draw_header_bar(&ab);
     editor_draw_rows(&ab);
-    editor_draw_status_bar(&ab);
-
+    editor_draw_status_bar(&ab); 
+    
     char buf[32];
     int vcol = cx_to_visual_col(ec->c_x);
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (ec->c_y - ec->rowoff) + 1, (vcol - ec->coloff) + 1);
+    /* Row +2: row 1 = header, text area starts at row 2 */
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (ec->c_y - ec->rowoff) + 2, (vcol - ec->coloff) + 1);
 
     ab_append(&ab, buf, strlen(buf));
     ab_append(&ab, "\x1b[?25h", 6);

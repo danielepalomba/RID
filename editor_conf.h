@@ -37,6 +37,12 @@ void editor_init(void);
 void editor_draw_status_bar(Abuf ab);
 
 /**
+ * @brief Draw a headebar into the appended buffer, showing the name of the editor and actual version.
+ * @param[in,out] ab Append buffer that accumulates terminal output.
+*/
+void editor_draw_header_bar(Abuf ab);
+
+/**
  * @brief  Insert a new row at position @p at, shifting subsequent rows down.
  * @param[in] at   Zero-based index where the row is inserted.
  * @param[in] s    Source bytes for the new row.
