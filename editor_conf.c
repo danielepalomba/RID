@@ -15,6 +15,8 @@
 static struct editor_conf ec_storage;
 Ec ec = &ec_storage;
 
+static int cx_to_visual_col(int);
+
 /** @copydoc editor_init */
 void editor_init(void){
     ec->c_x = 0;
@@ -32,7 +34,7 @@ void editor_init(void){
     }
 }
 
-/** @cpoydoc set_word_wrap */
+/** @copydoc editor_set_word_wrap */
 void editor_set_word_wrap(unsigned short flag){
     if(flag == 1)
         ec->word_wrap = flag;
@@ -221,6 +223,42 @@ void editor_del_char(int c){
         editor_del_row(ec->c_y);
         ec->c_y--;
     }
+}
+
+/** @copydoc editor_skip_word */
+void editor_skip_word(int direction){
+    if(ec->c_y >= (int)ec->numrows) return;
+
+    Rrow row = &ec->row[ec->c_y];
+    int  len = (int)utf8_codepoint_count(row->chars, row->size);
+
+    /* Returns 1 if the codepoint at index cp is a non-whitespace character */
+    #define IS_WORD(cp) \
+        ((unsigned char)row->chars[utf8_byte_offset(row->chars, row->size, (cp))] > ' ')
+
+    if(direction == 1){
+        /* Skip current word characters */
+        while(ec->c_x < len && IS_WORD(ec->c_x))
+            ec->c_x++;
+
+        /* Skip whitespace to reach the start of the next word */
+        while(ec->c_x < len && !IS_WORD(ec->c_x))
+            ec->c_x++;
+
+    } else if(direction == -1){
+       
+        if(ec->c_x > 0)
+            ec->c_x--;
+
+        while(ec->c_x > 0 && !IS_WORD(ec->c_x))
+            ec->c_x--;
+
+        /* Skip word characters leftward to reach the word's first character */
+        while(ec->c_x > 0 && IS_WORD(ec->c_x - 1))
+            ec->c_x--;
+    }
+
+    #undef IS_WORD
 }
 
 /** @copydoc editor_move_cursor */

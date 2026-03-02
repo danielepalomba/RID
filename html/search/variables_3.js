@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lang_0',['lang',['../structSyntax.html#a9d56b538b5467dd2837e803b253f1174',1,'Syntax']]]
+  ['keywords_0',['keywords',['../structSyntax.html#a9f02dd5fbd4f31d6f4bb88872b17eebf',1,'Syntax']]]
 ];

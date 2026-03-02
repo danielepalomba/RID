@@ -10,8 +10,8 @@
  * @brief Dynamically growable byte buffer used for batched terminal writes.
  */
 struct abuf{
-    char *b;
-    int len;
+    char *b;   /**< Heap-allocated byte buffer.           */
+    int len;   /**< Number of bytes currently in the buffer. */
 };
 
 typedef struct abuf *Abuf;

@@ -63,11 +63,13 @@ int term_read_key(void){
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 
-        char seq[3];
+        /* Longest sequence we handle: ESC [ 1 ; 5 C  (6 bytes total,
+         * 5 after ESC – but we already consumed ESC, so read up to 5) */
+        char seq[5];
         int got = 0;
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 5; i++){
             ssize_t n = read(STDIN_FILENO, &seq[i], 1);
-            if(n != 1) break; /* no data available (EAGAIN) or error */
+            if(n != 1) break;
             got++;
         }
 
@@ -76,6 +78,14 @@ int term_read_key(void){
         if(got == 0) return '\x1b';
 
         if(seq[0] == '[' && got >= 2){
+            /* Ctrl+Arrow: ESC [ 1 ; 5 <letter>  (got == 5) */
+            if(got >= 5 && seq[1] == '1' && seq[2] == ';' && seq[3] == '5'){
+                switch(seq[4]){
+                    case 'C': return CTRL_ARROW_RIGHT;
+                    case 'D': return CTRL_ARROW_LEFT;
+                }
+            }
+            /* Plain arrows: ESC [ <letter> */
             switch(seq[1]){
                 case 'A': return ARROW_UP;
                 case 'B': return ARROW_DOWN;

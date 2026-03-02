@@ -16,7 +16,9 @@ enum editor_key {
     ARROW_LEFT = 1000,
     ARROW_RIGHT,
     ARROW_UP,
-    ARROW_DOWN
+    ARROW_DOWN,
+    CTRL_ARROW_LEFT,   /**< Ctrl+Left  – word jump backward */
+    CTRL_ARROW_RIGHT   /**< Ctrl+Right – word jump forward  */
 };
 
 /**

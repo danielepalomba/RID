@@ -26,4 +26,11 @@ extern const char *COLOR_SEQ[];
  */
 const char *scolor_get_seq(ColorCode color);
 
+/**
+ * @brief  Print a string to stdout wrapped in ANSI color codes.
+ * @param[in] color  Color to apply.
+ * @param[in] text   Null-terminated string to print.
+ */
+void print_colored(ColorCode color, const char *text);
+
 #endif

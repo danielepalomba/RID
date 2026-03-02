@@ -18,11 +18,7 @@ const char *scolor_get_seq(ColorCode color){
     return COLOR_SEQ[color];
 }
 
-/**
- * @brief  Print a string to stdout wrapped in ANSI color codes.
- * @param[in] color  Color to apply.
- * @param[in] text   Null-terminated string to print.
- */
+/** @copydoc print_colored */
 void print_colored(ColorCode color, const char *text){
     printf("%s%s%s", COLOR_SEQ[color], text, COLOR_SEQ[RESET]);
 }

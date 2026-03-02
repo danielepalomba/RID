@@ -75,6 +75,10 @@ int main(int argc, char **argv){
             editor_del_char(c);
         }else if(c == ARROW_UP || c == ARROW_DOWN || c == ARROW_LEFT || c == ARROW_RIGHT){
             editor_move_cursor(c);
+        }else if(c == CTRL_ARROW_RIGHT){
+            editor_skip_word(1);
+        }else if(c == CTRL_ARROW_LEFT){
+            editor_skip_word(-1);
         }else if(c == '\t'){
             editor_insert_tab();
         }else{
