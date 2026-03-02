@@ -47,7 +47,7 @@ void editor_draw_status_bar(Abuf ab){
     /* Inverted colors */
     ab_append(ab, "\x1b[7m", 4);
 
-    char status[80];
+    char status[90];
     int len;
 
     const char *fname = ec->filename ? ec->filename : "[No Name]";
@@ -214,10 +214,22 @@ void editor_move_cursor(int key){
             }
             break;
         case ARROW_UP:
-            if(ec->c_y != 0) ec->c_y--;
+            if(ec->c_y != 0){
+                ec->c_y--;
+                /* Clamp c_x to the new row's length */
+                int up_cp = (int)utf8_codepoint_count(
+                    ec->row[ec->c_y].chars, ec->row[ec->c_y].size);
+                if(ec->c_x > up_cp) ec->c_x = up_cp;
+            }
             break;
         case ARROW_DOWN:
-            if(ec->c_y < (int)ec->numrows - 1) ec->c_y++;
+            if(ec->c_y < (int)ec->numrows - 1){
+                ec->c_y++;
+                /* Clamp c_x to the new row's length */
+                int dn_cp = (int)utf8_codepoint_count(
+                    ec->row[ec->c_y].chars, ec->row[ec->c_y].size);
+                if(ec->c_x > dn_cp) ec->c_x = dn_cp;
+            }
             break;
     }
 }

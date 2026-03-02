@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 #include "editor_conf.h"
 #include "term.h"
 
@@ -50,18 +52,40 @@ int term_read_key(void){
         if(nread == -1) exit(EXIT_FAILURE);    
     }
 
-    /* VT100 escape sequences: ESC [ <letter> maps to arrow keys */
+    /* VT100 escape sequences: ESC [ <letter> maps to arrow keys.
+     *
+     * Make stdin temporarily non-blocking so that reads of the bytes
+     * following ESC return immediately (EAGAIN) if nothing is available.
+     * This avoids blocking forever on a lone ESC without touching termios
+     * (which would risk re-enabling ECHO/ICANON and printing raw bytes).
+     */
     if(c == '\x1b'){
-        char seq[3];
-        if(read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
-        if(read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+        int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 
-        if(seq[0] == '['){
+        char seq[3];
+        int got = 0;
+        for(int i = 0; i < 3; i++){
+            ssize_t n = read(STDIN_FILENO, &seq[i], 1);
+            if(n != 1) break; /* no data available (EAGAIN) or error */
+            got++;
+        }
+
+        fcntl(STDIN_FILENO, F_SETFL, flags); /* restore blocking mode */
+
+        if(got == 0) return '\x1b';
+
+        if(seq[0] == '[' && got >= 2){
             switch(seq[1]){
                 case 'A': return ARROW_UP;
-                case 'B' : return ARROW_DOWN;
-                case 'C' : return ARROW_RIGHT;
-                case 'D' : return ARROW_LEFT;
+                case 'B': return ARROW_DOWN;
+                case 'C': return ARROW_RIGHT;
+                case 'D': return ARROW_LEFT;
+                /* Delete key: ESC [ 3 ~ */
+                case '3':
+                    if(got >= 3 && seq[2] == '~')
+                        return BACKSPACE;
+                    break;
             }
         }
         return '\x1b';
