@@ -42,6 +42,29 @@ void editor_set_word_wrap(unsigned short flag){
         ec->word_wrap = 1; //default
 }
 
+/** @copydoc editor_set_cursor */
+void editor_set_cursor(int x, int y){
+    if(x < 0 || y < 0) return;
+    if((size_t)y > ec->numrows) return;
+
+    /* c_x is a codepoint index: clamp to row length (or 0 for the virtual empty last row) */
+    int max_x = 0;
+    if((size_t)y < ec->numrows)
+        max_x = (int)utf8_codepoint_count(ec->row[y].chars, ec->row[y].size);
+
+    if(x > max_x) return;
+
+    ec->c_x = x;
+    ec->c_y = y;
+}
+
+/** @copydoc editor_get_cursor */
+void editor_get_cursor(int *cords){
+    cords[0] = ec->c_x;
+    cords[1] = ec->c_y;
+}
+
+
 /** @copydoc editor_draw_status_bar */
 void editor_draw_status_bar(Abuf ab){
     /* Inverted colors */

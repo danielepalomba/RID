@@ -32,9 +32,19 @@ extern Ec ec;
 void editor_init(void);
 
 /**
- * @bried Setter function for word_wrap field in editor_conf
+ * @brief Setter function for word_wrap field in editor_conf
 */
 void editor_set_word_wrap(unsigned short flag);
+
+/**
+* @brief Set editor_conf.c_x = x, editor_conf.c_y = y
+*/
+void editor_set_cursor(int x, int y);
+
+/**
+* @brief Retrieve the coordinates of the cursor
+*/
+void editor_get_cursor(int *cords);
 
 /**
  * @brief  Draw the status bar (last terminal row) into the append buffer.

@@ -33,6 +33,8 @@ int main(int argc, char **argv){
     
     system("clear");
     editor_init();
+    
+    int cords[2]; /* cords[0] = x; cords[1] = y */
 
     switch(argc){
         case 2: 
@@ -77,7 +79,23 @@ int main(int argc, char **argv){
             editor_insert_tab();
         }else{
             if(c >= 32 && c != 127){
-                editor_insert_char(c);
+                editor_get_cursor(cords);
+               /* auto-completion of brackets */
+               switch(c){  
+                    case 40:
+                        editor_insert_char(c);
+                        editor_insert_char(c+1);
+                        editor_set_cursor(cords[0]+1, cords[1]);
+                        break;
+                    case 91:
+                    case 123:
+                        editor_insert_char(c);
+                        editor_insert_char(c+2);
+                        editor_set_cursor(cords[0]+1, cords[1]);
+                        break;
+                    default:
+                        editor_insert_char(c);
+                }
             }
         }
         editor_refresh_screen();
