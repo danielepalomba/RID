@@ -25,6 +25,7 @@ void set_input_mode(void){
     atexit(reset_input_mode);
 
     tcgetattr(STDIN_FILENO, &attr);
+    attr.c_iflag &= ~(IXON);
     attr.c_lflag &= ~(ICANON | ECHO);
     attr.c_cc[VMIN] = 1;
     attr.c_cc[VTIME] = 0;
