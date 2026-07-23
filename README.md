@@ -2,6 +2,10 @@
 
 A minimal text editor written from scratch in C, designed to provide an essential editing experience with built-in syntax highlighting for the C language.
 
+<p align="center">
+  <img src="assets/rid-dragon.png" alt="rid dragon" width="320">
+</p>
+
 ## Features
 
 * **Syntax Highlighting:** Full support for standard C11 keywords and categories.
